@@ -1,58 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="assets/favicon.ico" rel="shortcut icon" />
+    <link rel="stylesheet" href="css/owfont-regular.css" />
+    <script type="module" src="./app.js" defer></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Momentum</title>
+  </head>
 
-<head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link href="assets/favicon.ico" rel="shortcut icon" />
-	<link rel="stylesheet" href="css/owfont-regular.css" />
-	<link rel="stylesheet" href="css/style.css" />
-	<title>Momentum</title>
-</head>
+  <body>
+    <header class="header">
+      <div class="player">
+        <div class="player-controls">
+          <button class="play-prev player-icon"></button>
+          <button class="play player-icon"></button>
+          <button class="play-next player-icon"></button>
+        </div>
+        <ul class="play-list"></ul>
+      </div>
+      <div class="weather">
+        <input type="text" class="city" value="Minsk" />
+        <i class="weather-icon owf"></i>
+        <div class="weather-error"></div>
+        <div class="description-container">
+          <span class="temperature"></span>
+          <span class="feelslike"></span>
+          <span class="weather-description"></span>
+        </div>
+        <div class="wind"></div>
+        <div class="humidity"></div>
+      </div>
+    </header>
+    <main class="main">
+      <div class="slider-icons">
+        <button class="slide-prev slider-icon"></button>
+        <button class="slide-next slider-icon"></button>
+      </div>
+      <time class="time"></time>
+      <date class="date"></date>
+      <div class="greeting">
+        <span class="greeting-text"></span>
+        <input type="text" class="name" placeholder="[Enter name]" />
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="settings">
+        <button class="open-settings-btn"></button>
 
-<body>
-	<header class="header">
-		<div class="player">
-			<div class="player-controls">
-				<button class="play-prev player-icon"></button>
-				<button class="play player-icon"></button>
-				<button class="play-next player-icon"></button>
-			</div>
-			<ul class="play-list"></ul>
-		</div>
-		<div class="weather">
-			<input type="text" class="city" />
-			<i class="weather-icon owf"></i>
-			<div class="weather-error"></div>
-			<div class="description-container">
-				<span class="temperature"></span>
-				<span class="feelslike"></span>
-				<span class="weather-description"></span>
-			</div>
-			<div class="wind"></div>
-			<div class="humidity"></div>
-		</div>
-	</header>
-	<main class="main">
-		<div class="slider-icons">
-			<button class="slide-prev slider-icon"></button>
-			<button class="slide-next slider-icon"></button>
-		</div>
-		<time class="time"></time>
-		<date class="date"></date>
-		<div class="greeting-container">
-			<span class="greeting"></span>
-			<input type="text" class="name" placeholder="[Enter name]" />
-		</div>
-	</main>
-	<footer class="footer">
-		<button class="change-quote"></button>
-		<div>
-			<div class="quote"></div>
-			<div class="author"></div>
-		</div>
-	</footer>
-	<script type="module" src="js/script.js"></script>
-</body>
+        <div class="popup">
+          <div class="language-switcher">
+            <p>Select your language:</p>
+            <div class="radio-group">
+              <label>
+                <input type="radio" name="language" value="en" checked />
+                English
+              </label>
+              <label>
+                <input type="radio" name="language" value="ru" />
+                Русский
+              </label>
+            </div>
+          </div>
 
+          <div class="switch-container-blocks">
+            <p>Show/Hide Blocks</p>
+            <div class="blocks-grid">
+              <label>
+                <input type="checkbox" name="blocks" value="time" checked />
+                <span>Time</span>
+              </label>
+              <label>
+                <input type="checkbox" name="blocks" value="date" checked />
+                <span>Date</span>
+              </label>
+              <label>
+                <input type="checkbox" name="blocks" value="greeting" checked />
+                <span>Greeting</span>
+              </label>
+              <label>
+                <input type="checkbox" name="blocks" value="quote" checked />
+                <span>Quote</span>
+              </label>
+              <label>
+                <input type="checkbox" name="blocks" value="weather" checked />
+                <span>Weather</span>
+              </label>
+              <label>
+                <input type="checkbox" name="blocks" value="player" checked />
+                <span>Audio Player</span>
+              </label>
+              <label>
+                <input type="checkbox" name="blocks" value="todoList" checked />
+                <span>To-Do List</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="switch-container">
+            <p>Gallery</p>
+            <label>
+              <input type="radio" name="source" value="github" checked />
+              <span>GitHub</span>
+            </label>
+            <label>
+              <input type="radio" name="source" value="unsplash" />
+              <span>Unsplash</span>
+            </label>
+            <label>
+              <input type="radio" name="source" value="flickr" />
+              <span>Flickr</span>
+            </label>
+            <input
+              placeholder="Search high-resolution images"
+              type="text"
+              class="tag-input"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="quote">
+        <button class="change-quote"></button>
+        <div>
+          <div class="quote-text"></div>
+          <div class="author"></div>
+        </div>
+      </div>
+      <div class="todoList">
+        <p class="open-todo">TODO LIST</p>
+        <div class="todo-list popup_todo">
+          <h2>Today</h2>
+          <ul class="task-list"></ul>
+          <form class='todo-form'>
+            <input type="text" class="new-task" placeholder="New Todo" />
+            <button type="submit" class='btn_add'>Add</button>
+          </form>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>
