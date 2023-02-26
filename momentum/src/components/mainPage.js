@@ -1,17 +1,36 @@
 export const getTimeOfDay = () => {
+  const lang = localStorage.getItem('language') || 'en';
   const date = new Date();
   const hours = date.getHours();
-  const arr = ['morning', 'afternoon', 'evening', 'night'];
-  const timeofDay = arr[Math.floor(hours / 6) - 1];
-  return timeofDay;
+  const arr =
+    lang == 'en'
+      ? ['morning', 'afternoon', 'evening', 'night']
+      : ['утро', 'день', 'вечер', 'ночь'];
+  const timeOfDay = arr[Math.floor((hours % 24) / 6)];
+  return timeOfDay;
+};
+
+const greetingLang = {
+  en: {
+    good: 'Good',
+    placeholder: '[Enter name]',
+  },
+  ru: {
+    good: 'Добрый',
+    placeholder: '[Введите имя]',
+  },
 };
 
 const showGreeting = span => {
-  const greetingText = `Good ${getTimeOfDay()}, `;
+  const lang = localStorage.getItem('language');
+
+  const greetingText = `${greetingLang[lang].good} ${getTimeOfDay()}, `;
   span.textContent = greetingText;
+  document.querySelector('.name').placeholder = greetingLang[lang].placeholder;
 };
 
 const getDateTime = () => {
+  const lang = localStorage.getItem('language');
   const now = new Date();
   const options = {
     weekday: 'long',
@@ -20,7 +39,7 @@ const getDateTime = () => {
     day: 'numeric',
     timeZone: 'UTC',
   };
-  const currentDate = now.toLocaleDateString('en-US', options);
+  const currentDate = now.toLocaleDateString(`${lang}-US`, options);
   const currentTime = now.toLocaleTimeString();
   return { currentDate, currentTime };
 };

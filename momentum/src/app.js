@@ -12,8 +12,6 @@ window.addEventListener('load', () => {
     name.value = localStorage.getItem('name');
   }
 });
-// --------------SLIDER-------------------------------------------------
-Background();
 // --------------WEATHER-------------------------------------------------
 const weatherIcon = document.querySelector('.weather-icon');
 const temperature = document.querySelector('.temperature');
@@ -24,13 +22,13 @@ const weatherError = document.querySelector('.weather-error');
 const feelslike = document.querySelector('.feelslike');
 const city = document.querySelector('.city');
 
-const template = {
+const weatherLang = {
   en: {
     error: 'ERROR. Please enter valid city!',
     humidity: 'Humidity',
     wind: 'Wind speed',
     feelslike: 'Feels like',
-    speed: 'm/s', 
+    speed: 'm/s',
   },
   ru: {
     error: 'ОШИБКА. Пожалуйста, введите действительный город!',
@@ -41,7 +39,9 @@ const template = {
   },
 };
 
-async function getWeather(lang, city) {
+export async function getWeather() {
+  const lang = localStorage.getItem('language');
+  const city = localStorage.getItem('city');
   try {
     const url = `https://api.openweathermap.org/data/2.5/weather
 	?q=${city}&lang=${lang}&appid=6e4000a6381415cb777aa617f94a608f&units=metric`;
@@ -52,21 +52,25 @@ async function getWeather(lang, city) {
     weatherIcon.className = 'weather-icon owf';
     weatherIcon.classList.add(`owf-${data.weather[0].id}`);
     temperature.textContent = `${Math.round(data.main.temp)}°C`;
-    feelslike.textContent = `Feels like ${Math.round(data.main.feels_like)}°C`;
+    feelslike.textContent = `${weatherLang[lang].feelslike} ${Math.round(
+      data.main.feels_like
+    )}°C`;
     weatherDescription.textContent =
       data.weather[0].description[0].toUpperCase() +
       data.weather[0].description.slice(1);
-    wind.textContent = `Wind speed: ${Math.round(data.wind.speed)} m/s`;
-    humidity.textContent = `Humidity: ${data.main.humidity}%`;
+    wind.textContent = `${weatherLang[lang].wind}: ${Math.round(
+      data.wind.speed
+    )} ${weatherLang[lang].speed}`;
+    humidity.textContent = `${weatherLang[lang].humidity}: ${data.main.humidity}%`;
   } catch {
-    weatherError.textContent = template[lang].error;
+    weatherError.textContent = weatherLang[lang].error;
     weatherIcon.className = 'weather-icon owf';
     temperature.textContent = '';
     feelslike.textContent = ``;
     weatherDescription.textContent = '';
     wind.textContent = '';
     humidity.textContent = '';
-    alert(`Error 404: city not found => Please enter valid city!`);
+    alert(weatherLang[lang].error);
   }
 }
 
@@ -89,18 +93,18 @@ window.addEventListener('load', () => {
 const quote = document.querySelector('.quote-text');
 const author = document.querySelector('.author');
 const nextQuoteBtn = document.querySelector('.change-quote');
-const getQuotes = async function () {
-  let quoteIndex = getRandomNum(0, 101);
-  const quotes = './components/quotes.json';
+export const getQuotes = async function () {
+  const language = localStorage.getItem('language');
+  const quotes = `./assets/quotes-${language}.json`;
   const response = await fetch(quotes);
   const data = await response.json();
+  let quoteIndex = getRandomNum(0, data.length - 1);
   quote.textContent = data[quoteIndex].quote;
   author.textContent = data[quoteIndex].author;
 };
 
 nextQuoteBtn.addEventListener('click', getQuotes);
 // --------------AUDIO-------------------------------------------------
-import { setSong } from './components/audio.js';
 import { Background } from './components/background.js';
 import { renderTime } from './components/mainPage.js';
 import playList from './components/playList.js';
@@ -110,12 +114,14 @@ const playPrev = document.querySelector('.play-prev');
 const playNext = document.querySelector('.play-next');
 const playBtn = document.querySelector('.play');
 const playerPlaylist = document.querySelector('.play-list');
+const audio = new Audio();
 let isPlay = false;
 let playNum = 0;
-const audio = new Audio();
 
+// Play or pause the audio when the play button is clicked
 const playAudio = () => {
   audio.src = playList[playNum].src;
+  setLiStyle();
   audio.currentTime = 0;
   if (isPlay === false) {
     audio.play();
@@ -128,12 +134,16 @@ const playAudio = () => {
   }
 };
 playBtn.onclick = playAudio;
+
+// Play the next song when the next button is clicked
 playNext.onclick = () => {
   isPlay = false;
   playNum = playNum === playList.length - 1 ? 0 : (playNum += 1);
   playAudio();
   playBtn.classList.add('pause');
 };
+
+// Play the previous song when the previous button is clicked
 playPrev.onclick = () => {
   isPlay = false;
   playNum = playNum === 0 ? playList.length - 1 : (playNum -= 1);
@@ -141,17 +151,16 @@ playPrev.onclick = () => {
   playBtn.classList.add('pause');
 };
 
-setSong(playList, playerPlaylist);
+// Highlight the currently playing song in the playlist
 function setLiStyle() {
   const items = document.querySelectorAll('.play-item');
-  console.log(items);
-  items.forEach((el, i) => {
-    if (el.classList.contains('item-active')) {
-      el.classList.remove('item-active');
-    }
-    el[playNum].classList.add('item-active');
+  items.forEach(el => {
+    el.classList.remove('item-active');
   });
+  items[playNum].classList.toggle('item-active');
 }
+
+// Play the next song when the current song ends
 audio.addEventListener('ended', () => {
   playNum = playNum === playList.length - 1 ? 0 : (playNum += 1);
   isPlay = false;
@@ -159,9 +168,21 @@ audio.addEventListener('ended', () => {
   playBtn.classList.add('pause');
 });
 
+// Set the title and duration of each song in the playlist
+const setSong = (playList, playerPlaylist) => {
+  playList.forEach(song => {
+    const li = document.createElement('li');
+    li.classList.add('play-item');
+    li.innerHTML = `<span class="play-title">${song.title}</span> <span class="play-duration">${song.duration}</span>`;
+    playerPlaylist.append(li);
+  });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  Background();
   renderTime();
   getWeather(state.currentLang, city.value);
   getQuotes();
   Settings();
+  setSong(playList, playerPlaylist);
 });

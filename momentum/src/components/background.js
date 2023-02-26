@@ -6,7 +6,6 @@ async function setUnsplashImage(query) {
   const url = `https://api.unsplash.com/photos/random?orientation=landscape&query=${query}&client_id=EYGGj9W5IVW5Aybe1gXq1iBzDifIxNI-ART73mnLY-U`;
   const res = await fetch(url);
   const data = await res.json();
-  // console.log(data.urls.regular);
   try {
     return data.urls.regular;
   } catch (err) {
@@ -47,7 +46,6 @@ export const createImageUrl = async () => {
   } else if (state.photoSource === 'flickr') {
     const tag = localStorage.getItem('query') || 'nature';
     bgUrl = await setFlickrImage(tag);
-    console.log(1);
   } else {
     const bgNum = randomNum.toString().padStart(2, '0');
     bgUrl = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`;

@@ -1,4 +1,6 @@
+import { getQuotes, getWeather } from '../app.js';
 import { createImageUrl } from './background.js';
+import { renderTime } from './mainPage.js';
 import { TodoList } from './todoList.js';
 
 TodoList();
@@ -48,25 +50,34 @@ blocks.forEach(checkbox => {
 
 const language = {
   en: {
-    greeting: 'Good morning',
-
-    quoteAuthor: 'Author unknown',
-    settings: 'Settings',
+    changeLang: 'Select your language',
+    showHideBlocks: 'Show/Hide Blocks',
     gallery: 'Gallery',
-
     searchPlaceholder: 'Search high-resolution images',
-    quoteOfTheDay: 'Quote of the day',
-    weather: 'Weather',
+    checkboxes: {
+      time: 'Time',
+      date: 'Date',
+      greeting: 'Greeting',
+      quote: 'Quote',
+      weather: 'Weather',
+      player: 'Audio Player',
+      todoList: 'To-Do List',
+    },
   },
   ru: {
-    greeting: 'Доброе утро',
-
-    quoteAuthor: 'Автор неизвестен',
-    settings: 'Настройки',
-
+    changeLang: 'Выберите ваш язык',
+    showHideBlocks: 'Показать/скрыть блоки',
+    gallery: 'Галерея',
     searchPlaceholder: 'Поиск изображений высокого разрешения',
-    quoteOfTheDay: 'Цитата дня',
-    weather: 'Погода',
+    checkboxes: {
+      time: 'Время',
+      date: 'Дата',
+      greeting: 'Приветствие',
+      quote: 'Цитата',
+      weather: 'Погода',
+      player: 'Аудиоплеер',
+      todoList: 'Список дел',
+    },
   },
 };
 
@@ -81,33 +92,34 @@ languageRadios.forEach(radio => {
   }
 });
 
-// Add a change event listener to the languageRadios to update the selected language and store it in localStorage
 languageRadios.forEach(radio => {
   radio.addEventListener('change', () => {
     state.currentLang = radio.value;
     localStorage.setItem('language', state.currentLang);
-    // Call a function to update the UI with the new language
     updateUI(language[state.currentLang]);
   });
 });
-// Function to update the UI with the selected language
-// function updateUI(language) {
-//   const greetingEl = document.querySelector('.greeting');
-//   const settingsEl = document.querySelector('.settings');
-//   const galleryEl = document.querySelector('.gallery p');
+const translateCheckboxes = lang => {
+  blocks.forEach(el => {
+    el.nextElementSibling.textContent = lang.checkboxes[el.value];
+  });
+};
+const updateUI = language => {
+  getWeather();
+  getQuotes();
+  renderTime();
 
-//   const searchInputEl = document.querySelector('.tag-input');
-//   const quoteOfTheDayEl = document.querySelector('.quote-of-the-day');
+  translateCheckboxes(language);
+  const changeLangEl = document.querySelector('.language-switcher p');
+  const galleryEl = document.querySelector('.gallery');
+  const searchInputEl = document.querySelector('.tag-input');
+  const showHideBlocks = document.querySelector('.show-hide');
 
-//   greetingEl.textContent = language.greeting;
-
-
-//   settingsEl.textContent = language.settings;
-//   galleryEl.textContent = language.gallery;
-//   searchInputEl.placeholder = language.searchPlaceholder;
-//   quoteOfTheDayEl.textContent = language.quoteOfTheDay;
-//   // weatherDescriptionEl.textContent = state
-// }
+  changeLangEl.textContent = language.changeLang;
+  showHideBlocks.textContent = language.showHideBlocks;
+  galleryEl.textContent = language.gallery;
+  searchInputEl.placeholder = language.searchPlaceholder;
+};
 
 const sourceRadios = document.querySelectorAll(
   'input[type="radio"][name="source"]'
