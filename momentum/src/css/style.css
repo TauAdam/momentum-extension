@@ -48,7 +48,11 @@ body {
   padding: 20px;
 }
 .player {
+  position: relative;
   transition: all 0.4s ease-in-out;
+}
+.player audio {
+  display: none;
 }
 .player-controls {
   display: flex;
@@ -57,12 +61,51 @@ body {
   width: 120px;
   margin-bottom: 28px;
 }
+.track-info {
+  flex: 1;
+  text-align: center;
+}
+.track-name {
+  font-size: 20px;
+  font-weight: bold;
+}
+.time-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+.sound-control {
+  margin: 20px;
+  display: flex;
+  align-items: center;
+}
+.volume-control {
+  position: relative;
+  margin-left: 8px;
+  width: 80px;
+}
+.volume-slider {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+}
+
+.progress {
+  margin-top: 20px;
+  height: 8px;
+  transition: width 0.1s linear;
+  height: 5px;
+  width: 100%;
+  cursor: pointer;
+}
 
 .play-list {
   text-align: left;
 }
 
 .play-item {
+  z-index: 5;
   position: relative;
   padding: 5px;
   padding-left: 20px;
@@ -354,11 +397,9 @@ body {
 }
 
 .open-settings-btn {
-  border: none;
+  font-size: 20px;
+  font-weight: 600;
   z-index: 2;
-  background-image: url('../assets/svg/gear.svg');
-  width: 30px;
-  height: 20px;
   position: relative;
   cursor: pointer;
 }

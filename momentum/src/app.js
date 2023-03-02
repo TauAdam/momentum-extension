@@ -1,4 +1,4 @@
-import { getRandomNum } from './components/utils.js';
+import { formatTime, getRandomNum } from './components/utils.js';
 // --------------GREETING-------------------------------------------------
 
 const name = document.querySelector('.name');
@@ -20,7 +20,7 @@ const wind = document.querySelector('.wind');
 const humidity = document.querySelector('.humidity');
 const weatherError = document.querySelector('.weather-error');
 const feelslike = document.querySelector('.feelslike');
-const city = document.querySelector('.city');
+const cityInput = document.querySelector('.city');
 
 const weatherLang = {
   en: {
@@ -40,8 +40,10 @@ const weatherLang = {
 };
 
 export async function getWeather() {
-  const lang = localStorage.getItem('language');
-  const city = localStorage.getItem('city');
+  const lang = localStorage.getItem('language') || 'en';
+  const city = localStorage.getItem('city') || 'Minsk';
+  cityInput.value = city;
+
   try {
     const url = `https://api.openweathermap.org/data/2.5/weather
 	?q=${city}&lang=${lang}&appid=6e4000a6381415cb777aa617f94a608f&units=metric`;
@@ -70,31 +72,23 @@ export async function getWeather() {
     weatherDescription.textContent = '';
     wind.textContent = '';
     humidity.textContent = '';
-    alert(weatherLang[lang].error);
   }
 }
 
-city.addEventListener('keypress', event => {
+cityInput.addEventListener('keypress', event => {
   if (event.code === 'Enter') {
-    getWeather('en', city.value);
-    city.blur();
+    localStorage.setItem('city', cityInput.value);
+    getWeather();
+    cityInput.blur();
   }
 });
 
-window.addEventListener('beforeunload', () => {
-  localStorage.setItem('city', city.value);
-});
-window.addEventListener('load', () => {
-  if (localStorage.getItem('city')) {
-    city.value = localStorage.getItem('city');
-  }
-});
 // --------------QUOTES-------------------------------------------------
 const quote = document.querySelector('.quote-text');
 const author = document.querySelector('.author');
 const nextQuoteBtn = document.querySelector('.change-quote');
 export const getQuotes = async function () {
-  const language = localStorage.getItem('language');
+  const language = localStorage.getItem('language') || 'en';
   const quotes = `./assets/quotes-${language}.json`;
   const response = await fetch(quotes);
   const data = await response.json();
@@ -108,50 +102,70 @@ nextQuoteBtn.addEventListener('click', getQuotes);
 import { Background } from './components/background.js';
 import { renderTime } from './components/mainPage.js';
 import playList from './components/playList.js';
-import { Settings, state } from './components/settings.js';
+import { Settings } from './components/settings.js';
 
 const playPrev = document.querySelector('.play-prev');
 const playNext = document.querySelector('.play-next');
-const playBtn = document.querySelector('.play');
+const playPauseButton = document.querySelector('.play');
 const playerPlaylist = document.querySelector('.play-list');
+const audioPlayer = document.querySelector('.player');
+const trackName = audioPlayer.querySelector('.track-name');
+const currentTimeElement = audioPlayer.querySelector('.current-time');
+const totalTime = audioPlayer.querySelector('.total-time');
+const soundToggle = audioPlayer.querySelector('.sound-toggle');
+const volumeSlider = audioPlayer.querySelector('.volume-slider');
+const progressBar = audioPlayer.querySelector('.progress-bar');
+const progressSlider = audioPlayer.querySelector('.progress');
+
 const audio = new Audio();
 let isPlay = false;
 let playNum = 0;
 
-// Play or pause the audio when the play button is clicked
+let currentTrackTime = 0;
+let totalTrackTime = 0;
+
 const playAudio = () => {
   audio.src = playList[playNum].src;
+  trackName.textContent = playList[playNum].title;
+  totalTime.textContent = playList[playNum].duration;
   setLiStyle();
-  audio.currentTime = 0;
+  audio.currentTime = currentTrackTime;
   if (isPlay === false) {
-    audio.play();
-    playBtn.classList.toggle('pause');
+    audio.addEventListener('canplaythrough', () => {
+      audio.play();
+      totalTrackTime = audio.duration;
+      totalTime.textContent = formatTime(totalTrackTime);
+    });
+
+    playPauseButton.classList.toggle('pause');
     isPlay = true;
   } else {
-    audio.pause();
+    audio.addEventListener('canplaythrough', () => {
+      audio.pause();
+    });
     isPlay = false;
-    playBtn.classList.toggle('pause');
+    playPauseButton.classList.toggle('pause');
   }
 };
-playBtn.onclick = playAudio;
 
-// Play the next song when the next button is clicked
+playPauseButton.onclick = playAudio;
+
 playNext.onclick = () => {
   isPlay = false;
   playNum = playNum === playList.length - 1 ? 0 : (playNum += 1);
+  currentTrackTime = 0;
   playAudio();
-  playBtn.classList.add('pause');
+  playPauseButton.classList.add('pause');
 };
 
-// Play the previous song when the previous button is clicked
 playPrev.onclick = () => {
   isPlay = false;
   playNum = playNum === 0 ? playList.length - 1 : (playNum -= 1);
+  currentTrackTime = 0;
   playAudio();
-  playBtn.classList.add('pause');
+  playPauseButton.classList.add('pause');
 };
 
-// Highlight the currently playing song in the playlist
 function setLiStyle() {
   const items = document.querySelectorAll('.play-item');
   items.forEach(el => {
@@ -160,29 +174,76 @@ function setLiStyle() {
   items[playNum].classList.toggle('item-active');
 }
 
-// Play the next song when the current song ends
 audio.addEventListener('ended', () => {
   playNum = playNum === playList.length - 1 ? 0 : (playNum += 1);
   isPlay = false;
+  currentTrackTime = 0;
+
   playAudio();
-  playBtn.classList.add('pause');
+  playPauseButton.classList.add('pause');
 });
 
-// Set the title and duration of each song in the playlist
+audio.addEventListener('timeupdate', () => {
+  currentTrackTime = audio.currentTime;
+  currentTimeElement.textContent = formatTime(currentTrackTime);
+  progressSlider.value = (currentTrackTime / totalTrackTime) * 100;
+});
+
+progressSlider.addEventListener('input', () => {
+  const newCurrentTime = (progressSlider.value / 100) * totalTrackTime;
+  audio.currentTime = newCurrentTime;
+  currentTrackTime = newCurrentTime;
+  currentTimeElement.textContent = formatTime(currentTrackTime);
+  // progressSlider.style.width = `${(currentTrackTime / totalTrackTime) * 100}%`;
+});
+
+soundToggle.onclick = () => {
+  if (audio.muted === true) {
+    audio.muted = false;
+    soundToggle.textContent = 'Mute';
+  } else {
+    audio.muted = true;
+    soundToggle.textContent = 'Unmute';
+  }
+};
+volumeSlider.addEventListener('input', () => {
+  audio.volume = volumeSlider.value;
+});
 const setSong = (playList, playerPlaylist) => {
-  playList.forEach(song => {
+  playList.forEach((song, index) => {
     const li = document.createElement('li');
     li.classList.add('play-item');
-    li.innerHTML = `<span class="play-title">${song.title}</span> <span class="play-duration">${song.duration}</span>`;
+    li.innerHTML = `<span class="play-title">${song.title}</span>`;
+    li.addEventListener('click', () => {
+      currentTrackTime = 0;
+      isPlay = false;
+      playNum = index;
+      playPauseButton.classList.remove('pause');
+      playAudio();
+    });
     playerPlaylist.append(li);
   });
 };
+// setSong(playList, playerPlaylist);
+// progressBar.addEventListener('click', event => {
+//   const progressBarRect = progressBar.getBoundingClientRect();
+//   const clickX = event.clientX - progressBarRect.left;
+//   const progressBarWidth = progressBar.offsetWidth;
+//   const newCurrentTime = (clickX / progressBarWidth) * audioPlayer.duration;
+//   audio.currentTime = newCurrentTime;
+//   updateCurrentTimeUI();
+// });
+
+// function updateCurrentTimeUI() {
+//   currentTrackTime = audio.currentTime;
+//   currentTimeElement.textContent = formatTime(currentTrackTime);
+// }
 
 document.addEventListener('DOMContentLoaded', () => {
   Background();
-  renderTime();
-  getWeather(state.currentLang, city.value);
+  getWeather();
   getQuotes();
   Settings();
   setSong(playList, playerPlaylist);
+  renderTime();
 });

@@ -13,15 +13,45 @@
   <body>
     <header class="header">
       <div class="player">
-        <div class="player-controls">
-          <button class="play-prev player-icon"></button>
-          <button class="play player-icon"></button>
-          <button class="play-next player-icon"></button>
+        <div>
+          <div class="player-controls">
+            <button class="play-prev player-icon"></button>
+            <button class="play player-icon"></button>
+            <button class="play-next player-icon"></button>
+          </div>
+          <div class="track-info">
+            <span class="track-name"></span>
+            <span class="time-info">
+              <span class="current-time">0:00</span>
+              <span class="total-time">0:00</span>
+            </span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            step="0.1"
+            class="progress"
+          />
+          <div class="sound-control">
+            <button class="sound-toggle">Mute</button>
+            <div class="volume-control">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="1"
+                class="volume-slider"
+              />
+            </div>
+          </div>
         </div>
         <ul class="play-list"></ul>
       </div>
       <div class="weather">
-        <input type="text" class="city" value="Minsk" />
+        <input type="text" class="city" />
         <i class="weather-icon owf"></i>
         <div class="weather-error"></div>
         <div class="description-container">
@@ -47,7 +77,7 @@
     </main>
     <footer class="footer">
       <div class="settings">
-        <button class="open-settings-btn"></button>
+        <p class="open-settings-btn">Settings</p>
 
         <div class="popup">
           <div class="language-switcher">

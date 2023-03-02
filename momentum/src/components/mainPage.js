@@ -22,7 +22,7 @@ const greetingLang = {
 };
 
 const showGreeting = span => {
-  const lang = localStorage.getItem('language');
+  const lang = localStorage.getItem('language') || 'en';
 
   const greetingText = `${greetingLang[lang].good} ${getTimeOfDay()}, `;
   span.textContent = greetingText;
@@ -30,7 +30,7 @@ const showGreeting = span => {
 };
 
 const getDateTime = () => {
-  const lang = localStorage.getItem('language');
+  const lang = localStorage.getItem('language') || 'en';
   const now = new Date();
   const options = {
     weekday: 'long',
@@ -39,7 +39,10 @@ const getDateTime = () => {
     day: 'numeric',
     timeZone: 'UTC',
   };
-  const currentDate = now.toLocaleDateString(`${lang}-US`, options);
+  const currentDate = now.toLocaleDateString(
+    `${lang}-${lang.toUpperCase()}`,
+    options
+  );
   const currentTime = now.toLocaleTimeString();
   return { currentDate, currentTime };
 };
