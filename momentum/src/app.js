@@ -215,11 +215,15 @@ const setSong = (playList, playerPlaylist) => {
     li.classList.add('play-item');
     li.innerHTML = `<span class="play-title">${song.title}</span>`;
     li.addEventListener('click', () => {
-      currentTrackTime = 0;
-      isPlay = false;
-      playNum = index;
-      playPauseButton.classList.remove('pause');
-      playAudio();
+      if (playNum === index) {
+        playAudio();
+      } else {
+        currentTrackTime = 0;
+        isPlay = false;
+        playNum = index;
+        playPauseButton.classList.remove('pause');
+        playAudio();
+      }
     });
     playerPlaylist.append(li);
   });
